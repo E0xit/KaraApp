@@ -13,3 +13,5 @@ class MyApp extends StatelessWidget {
     return Scaffold();
   }
 }
+
+class GurtYo {}
