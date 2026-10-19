@@ -4,8 +4,8 @@ import '../../../core/constants/app_config.dart';
 import '../../../core/utils/promptpay_builder.dart';
 import '../../../data/api/google_sheet_api.dart';
 
-class PaymentDialog extends StatelessWidget {
-  final String tableNo;
+class PaymentDialog extends StatefulWidget {
+  final String tableNo; // รับค่า เช่น "01" หรือ "Table_01"
   final int total;
   final VoidCallback onPaidSuccess;
 
@@ -17,14 +17,26 @@ class PaymentDialog extends StatelessWidget {
   });
 
   @override
+  State<PaymentDialog> createState() => _PaymentDialogState();
+}
+
+class _PaymentDialogState extends State<PaymentDialog> {
+  bool _isProcessing = false;
+
+  @override
   Widget build(BuildContext context) {
+    // ปรับ Format ให้ตรงกับ 'Table_XX' เสมอ
+    final formattedTable = widget.tableNo.startsWith('Table_')
+        ? widget.tableNo
+        : 'Table_${widget.tableNo}';
+
     final payload = buildPromptPayPayload(
       Config.promptPayPhone,
-      total.toDouble(),
+      widget.total.toDouble(),
     );
 
     return AlertDialog(
-      title: Text('ชำระเงิน $total บาท'),
+      title: Text('ชำระเงิน ${widget.total} บาท'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -34,28 +46,66 @@ class PaymentDialog extends StatelessWidget {
             child: QrImageView(data: payload),
           ),
           const SizedBox(height: 8),
-          const Text('สแกนด้วยแอพธนาคารเพื่อจ่ายผ่าน PromptPay'),
+          const Text(
+            '[ Placeholder Mode ]\nสแกน QR หรือกดปุ่มจำลองการจ่ายเงินด้านล่าง',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 12, color: Colors.grey),
+          ),
         ],
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('ปิด'),
+          onPressed: _isProcessing ? null : () => Navigator.pop(context),
+          child: const Text('ยกเลิก'),
         ),
         FilledButton(
-          onPressed: () async {
-            Navigator.pop(context);
-            final ok = await Api.pay('Table_$tableNo', total, 'PromptPay');
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  ok ? 'บันทึกการชำระเงินแล้ว ขอบคุณครับ 🙏' : 'บันทึกไม่สำเร็จ',
-                ),
-              ),
-            );
-            onPaidSuccess();
-          },
-          child: const Text('จ่ายเงินแล้ว'),
+          onPressed: _isProcessing
+              ? null
+              : () async {
+                  setState(() => _isProcessing = true);
+
+                  debugPrint('💳 [Payment Attempt] Table: $formattedTable, Amount: ${widget.total}');
+
+                  // ยิง API ชำระเงิน
+                  final result = await Api.pay(
+                    formattedTable,
+                    widget.total,
+                    'PromptPay_Placeholder',
+                  );
+
+                  if (!mounted) return;
+                  setState(() => _isProcessing = false);
+
+                  if (result['ok'] == true) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('✅ จำลองการจ่ายเงินสำเร็จ! ขอบคุณครับ 🙏'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                    widget.onPaidSuccess();
+                  } else {
+                    final errorMsg = result['error'] ?? 'ไม่ทราบสาเหตุ';
+                    debugPrint('❌ [Payment Error Details]: $errorMsg');
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('❌ ชำระเงินไม่สำเร็จ: $errorMsg'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                },
+          child: _isProcessing
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+              : const Text('จำลองการจ่ายเงิน (Paid)'),
         ),
       ],
     );

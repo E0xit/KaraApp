@@ -10,14 +10,14 @@ class TableSelectScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('🍜 เลือกโต๊ะของคุณ')),
+      appBar: AppBar(title: const Text('🍜 ก๋วยเตี๋ยวชามกะละ ป้าแบน')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'แตะเลขโต๊ะที่นั่งอยู่ได้เลย',
+              'เลือกโต๊ะของคุณ',
               style: TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 12),
