@@ -16,10 +16,10 @@ class _TrackingScreenState extends State<TrackingScreen> {
   @override
   void initState() {
     super.initState();
-    _refresh();
+    _loadOrders();
   }
 
-  void _refresh() {
+  void _loadOrders() {
     final tableNo = context.read<AppProvider>().selectedTable;
     setState(() {
       _ordersFuture = ApiService.fetchOrders(tableNo);
@@ -32,11 +32,11 @@ class _TrackingScreenState extends State<TrackingScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('ติดตามออเดอร์ — โต๊ะ $tableNo'),
+        title: Text('ประวัติออเดอร์ โต๊ะ $tableNo'),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: _refresh,
+            onPressed: _loadOrders,
           ),
         ],
       ),
@@ -50,57 +50,37 @@ class _TrackingScreenState extends State<TrackingScreen> {
           final orders = snapshot.data ?? [];
 
           if (orders.isEmpty) {
-            return const Center(
-              child: Text('ยังไม่มีรายการที่สั่งสำหรับโต๊ะนี้'),
-            );
+            return const Center(child: Text('ไม่มีรายการออเดอร์'));
           }
 
           return ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: orders.length,
             itemBuilder: (context, index) {
-              final order = orders[index];
-              return Card(
-                elevation: 3,
+              final item = orders[index];
+              return Container(
                 margin: const EdgeInsets.only(bottom: 12),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'รหัสออเดอร์: ${order['order_id']}',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          Chip(
-                            label: Text(
-                              order['status'] ?? 'Cooking',
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                            backgroundColor: order['status'] == 'Paid'
-                                ? Colors.green
-                                : Colors.deepOrange,
-                          ),
-                        ],
-                      ),
-                      const Divider(),
-                      Text('รายการ: ${order['item_details']}'),
-                      const SizedBox(height: 8),
-                      Text(
-                        'ราคารวม: ${order['total_price']} บาท',
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('รหัสออเดอร์: ${item['order_id']}',
+                        style: const TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 4),
+                    Text('รายการ: ${item['item_details']}'),
+                    const SizedBox(height: 4),
+                    Text('ราคารวม: ${item['total_price']} บาท',
+                        style: const TextStyle(color: Colors.deepOrange)),
+                    const SizedBox(height: 4),
+                    Text('สถานะ: ${item['status'] ?? 'จ่ายแล้ว'}',
                         style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.deepOrange,
-                        ),
-                      ),
-                    ],
-                  ),
+                            color: Colors.green, fontWeight: FontWeight.bold)),
+                  ],
                 ),
               );
             },
