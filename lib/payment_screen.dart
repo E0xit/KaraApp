@@ -21,7 +21,8 @@ class PaymentScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text('ชำระเงิน — โต๊ะ ${provider.selectedTable}'),
       ),
-      body: SingleChildScrollView(
+      body: Center(
+          child: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -118,7 +119,7 @@ class PaymentScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
+      )),
     );
   }
 }
