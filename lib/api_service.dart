@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
   static const String webAppUrl =
-      'https://script.google.com/macros/s/AKfycbwv_n_js7XUHmYplKqfGjQc7wvMyYvGn3Xp-NvTFZKb2ASSmXBvJIIkJy6yW-X8_2G9Bw/exec';
+      'https://script.google.com/macros/s/AKfycby7g7bMvt79YkLVC25Klk-MjyGFtlUog4BHKR27OstB1Ju221f4cKLxFHWzeL2NVUDZjA/exec';
 
   static Future<Map<String, dynamic>> sendOrder(
       String tableNo, String itemDetails, int totalPrice,
