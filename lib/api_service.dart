@@ -18,7 +18,6 @@ class ApiService {
         'total_price': totalPrice,
         'status': status,
       });
-      debugPrint('Payload: $payload');
 
       final response = await http.post(
         Uri.parse(webAppUrl),
@@ -27,22 +26,35 @@ class ApiService {
       );
 
       debugPrint('Response Status Code: ${response.statusCode}');
-      debugPrint('Response Body: ${response.body}');
+      debugPrint('Response Body: "${response.body}"');
 
-      if (response.statusCode == 200 || response.statusCode == 302) {
-        final data = jsonDecode(response.body);
-        if (data['ok'] == true) {
-          return {'success': true, 'message': 'สำเร็จ'};
-        } else {
-          return {
-            'success': false,
-            'message': data['error'] ?? 'เกิดข้อผิดพลาดฝั่ง Server'
-          };
-        }
+      // 1. เช็กก่อนว่า Response Body ว่างเปล่าหรือไม่
+      if (response.body.isEmpty) {
+        return {
+          'success': false,
+          'message':
+              'Google Apps Script ตอบกลับเป็นข้อความว่างเปล่า (Empty Body)'
+        };
+      }
+
+      // 2. เช็กว่า Response เป็น HTML หรือไม่ (กรณีติดหน้าบล็อกหรือ Redirect)
+      if (response.body.startsWith('<!DOCTYPE html>') ||
+          response.body.startsWith('<html')) {
+        return {
+          'success': false,
+          'message':
+              'ได้รับหน้าเว็บ HTML แทนที่จะเป็น JSON (กรุณาเช็กการ Deploy ของ Apps Script)'
+        };
+      }
+
+      // 3. เมื่อมั่นใจว่ามีข้อมูล ค่อยทำการ jsonDecode
+      final data = jsonDecode(response.body);
+      if (data is Map && data['ok'] == true) {
+        return {'success': true, 'message': 'สำเร็จ'};
       } else {
         return {
           'success': false,
-          'message': 'HTTP Error: ${response.statusCode}'
+          'message': data['error'] ?? 'เกิดข้อผิดพลาดจากฝั่ง Server'
         };
       }
     } catch (e, stackTrace) {
@@ -55,15 +67,13 @@ class ApiService {
   static Future<List<dynamic>> fetchOrders(String tableNo) async {
     try {
       final url = '$webAppUrl?action=orders&table_no=Table_$tableNo';
-      debugPrint('Fetching orders from: $url');
-
       final response = await http.get(Uri.parse(url));
-      debugPrint('Fetch Status Code: ${response.statusCode}');
-      debugPrint('Fetch Body: ${response.body}');
 
-      if (response.statusCode == 200) {
-        final decoded = jsonDecode(response.body);
-        if (decoded is List) return decoded;
+      if (response.statusCode == 200 && response.body.isNotEmpty) {
+        if (!response.body.startsWith('<')) {
+          final decoded = jsonDecode(response.body);
+          if (decoded is List) return decoded;
+        }
       }
     } catch (e) {
       debugPrint('Fetch Orders Error: $e');
