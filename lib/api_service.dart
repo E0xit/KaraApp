@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
   static const String webAppUrl =
-      'https://script.google.com/macros/s/AKfycby7g7bMvt79YkLVC25Klk-MjyGFtlUog4BHKR27OstB1Ju221f4cKLxFHWzeL2NVUDZjA/exec';
+      'https://script.google.com/macros/s/AKfycbwCikXxix3359EN81zYOnNuMbtn6rF13m_OtlZNK5w-RSJovrHvPnUm9tdLr_PzNP8vPA/exec';
 
   static Future<void> sendOrder(
       String tableNo, String itemDetails, int totalPrice,
