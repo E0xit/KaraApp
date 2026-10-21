@@ -29,7 +29,8 @@ class PaymentScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 20),
-              Image.asset('assets/qr_code.png', width: 220, height: 220),
+              Image.asset('assets/qr-code-scan-me-placeholder.png',
+                  width: 220, height: 220),
               const SizedBox(height: 20),
               Text(
                 'ยอดชำระรวม: ${provider.totalPrice} บาท',
