@@ -6,9 +6,18 @@ void main() {
   runApp(
     ChangeNotifierProvider(
       create: (_) => AppProvider(),
-      child: const MaterialApp(
-        home: HomeScreen(),
+      child: MaterialApp(
+        home: const HomeScreen(),
         debugShowCheckedModeBanner: false,
+        builder: (context, child) {
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              textScaler: const TextScaler.linear(
+                  1.3), // 1.0 = ปกติ, 1.3 = ใหญ่ขึ้น 30%
+            ),
+            child: child!,
+          );
+        },
       ),
     ),
   );
