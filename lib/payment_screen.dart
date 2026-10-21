@@ -24,6 +24,7 @@ class PaymentScreen extends StatelessWidget {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text(
               'สแกน QR Code เพื่อชำระเงิน',
