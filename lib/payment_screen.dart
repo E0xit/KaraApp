@@ -67,7 +67,6 @@ class PaymentScreen extends StatelessWidget {
 
             const SizedBox(height: 30),
 
-            // ปุ่มกดเพื่อสำเร็จขั้นตอนชำระเงิน
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
@@ -75,8 +74,12 @@ class PaymentScreen extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
               ),
               onPressed: () async {
-                // ส่งข้อมูลเข้า Sheet พร้อมสถานะ "จ่ายแล้ว"
-                bool success = await ApiService.sendOrder(
+                // แสดง Loading แป๊บนึง
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('กำลังส่งข้อมูล...')),
+                );
+
+                final result = await ApiService.sendOrder(
                   provider.selectedTable,
                   itemDetails,
                   provider.totalPrice,
@@ -84,22 +87,24 @@ class PaymentScreen extends StatelessWidget {
                 );
 
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        success
-                            ? 'ชำระเงินสำเร็จ (บันทึกสถานะ จ่ายแล้ว)'
-                            : 'ส่งข้อมูลไม่สำเร็จ',
-                      ),
-                    ),
-                  );
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
-                  if (success) {
+                  if (result['success'] == true) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('✅ ชำระเงินสำเร็จแล้ว!')),
+                    );
                     provider.clearCart();
-                    // ย้ายไปหน้าประวัติออเดอร์
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (_) => const TrackingScreen()),
+                    );
+                  } else {
+                    // โชว์ข้อความ Error ที่ดักได้จริงบนจอ
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: Colors.red,
+                        content: Text('❌ ล้มเหลว: ${result['message']}'),
+                      ),
                     );
                   }
                 }
