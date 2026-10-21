@@ -12,8 +12,7 @@ void main() {
         builder: (context, child) {
           return MediaQuery(
             data: MediaQuery.of(context).copyWith(
-              textScaler: const TextScaler.linear(
-                  1.3), // 1.0 = ปกติ, 1.3 = ใหญ่ขึ้น 30%
+              textScaler: const TextScaler.linear(1.3),
             ),
             child: child!,
           );
@@ -23,14 +22,13 @@ void main() {
   );
 }
 
-// จัดการสถานะ (State) ของแอปพลิเคชัน
 class AppProvider extends ChangeNotifier {
   String selectedTable = '01';
   final List<Map<String, dynamic>> cart = [];
 
   void setTable(String table) {
     selectedTable = table;
-    cart.clear(); // เปลี่ยนโต๊ะแล้วล้างตะกร้า
+    cart.clear();
     notifyListeners();
   }
 
@@ -66,7 +64,6 @@ class AppProvider extends ChangeNotifier {
   }
 }
 
-// หน้าเลือกโต๊ะ
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -93,8 +90,6 @@ class HomeScreen extends StatelessWidget {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
-
-              // Dropdown เลือกโต๊ะ
               DropdownButton<String>(
                 value: provider.selectedTable,
                 items: List.generate(20, (i) {
@@ -105,9 +100,7 @@ class HomeScreen extends StatelessWidget {
                   if (val != null) provider.setTable(val);
                 },
               ),
-
               const SizedBox(height: 30),
-
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.deepOrange,

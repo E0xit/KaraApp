@@ -45,7 +45,6 @@ class MenuScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // ก๋วยเตี๋ยวเรือ / ลวกจิ้ม
           Container(
             padding: const EdgeInsets.all(16),
             color: Colors.orange.shade50,
@@ -93,8 +92,6 @@ class MenuScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-
-          // เมนูพิเศษ
           const Text('เมนูพิเศษ (189 บาท)',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           const Divider(),
@@ -110,8 +107,6 @@ class MenuScreen extends StatelessWidget {
               ],
             ),
           const SizedBox(height: 16),
-
-          // เครื่องเคียง
           const Text('เครื่องเคียง',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           const Divider(),
@@ -129,8 +124,6 @@ class MenuScreen extends StatelessWidget {
           const Text('ข้าวเกรียบ / ผักสด ฟรี!!',
               style: TextStyle(color: Colors.green)),
           const SizedBox(height: 20),
-
-          // ตะกร้า
           const Text('รายการในตะกร้า:',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           const Divider(),
